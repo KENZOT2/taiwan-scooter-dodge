@@ -294,7 +294,7 @@ class Game {
             if (second === 33 && !this.boss33Triggered) { this.boss33Triggered = true; this.triggerUltraBossB(); }
             if (second === 53 && !this.boss53Triggered) { this.boss53Triggered = true; this.triggerUltraBossC(); }
             if (second === 73 && !this.boss73Triggered) { this.boss73Triggered = true; this.triggerUltraBossFinal(); }
-            if (second === 85 && !this.boss85Triggered) { this.boss85Triggered = true; this.triggerFraudFall(); }
+            if (second === 85 && !this.boss85Triggered) { this.boss85Triggered = true; this.triggerUltraFraudFallStorm(); }
         } else {
             if (second === 20 && !this.boss20Triggered) { this.boss20Triggered = true; this.triggerPotholeStorm(); }
             if (second === 40 && !this.boss40Triggered) { this.boss40Triggered = true; this.triggerMotorcycleSqueeze(); }
@@ -475,6 +475,17 @@ class Game {
             state: 'riding',
             fallTimer: 0
         });
+    }
+
+    triggerUltraFraudFallStorm() {
+        this.triggerFraudFall();
+        
+        // 終極三寶特攻隊：路人、阿嬤、狗、貓 從兩側暴衝而出
+        if (window.audioManager) window.audioManager.playScreech();
+        this.spawnObstacle('dog', { x: -20, y: 0, targetX: 450, speedY: 0 }); // 左側衝出的狗
+        this.spawnObstacle('cat', { x: 470, y: -50, targetX: -50, speedY: 0 }); // 右側衝出的貓
+        this.spawnObstacle('pedestrian', { x: -40, y: -120, targetX: 350, speedY: 0, isGranny: false }); // 左側路人
+        this.spawnObstacle('pedestrian', { x: 490, y: -120, targetX: 100, speedY: 0, isGranny: true }); // 右側阿嬤
     }
 
     // --- PHYSICS & LOGIC LOOP ---
