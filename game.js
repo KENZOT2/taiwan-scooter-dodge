@@ -165,6 +165,11 @@ class Game {
             window.audioManager.stopEngine();
             window.audioManager.playWin();
         }
+        if (!this.isUltraMode && localStorage.getItem('gameBeaten') !== 'true') {
+            document.getElementById('unlock_message').style.display = 'block';
+        } else {
+            document.getElementById('unlock_message').style.display = 'none';
+        }
         localStorage.setItem('gameBeaten', 'true');
         document.getElementById('hud_overlay').style.display = 'none';
         const vicScreen = document.getElementById('victory_screen');
