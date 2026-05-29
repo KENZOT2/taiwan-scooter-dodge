@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+
+:root {
+    --bg-dark: #0a0a16;
+    --neon-blue: #00f0ff;
+    --neon-pink: #ff007f;
+    --neon-yellow: #ffea00;
+    --neon-green: #39ff14;
+    --glass-bg: rgba(16, 16, 36, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #8b8ba7;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 0, 127, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.15) 0px, transparent 50%);
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Outer layout wrapper */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    max-height: 900px;
+    padding: 10px;
+    position: relative;
+}
+
+/* Header Info */
+.header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.game-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.mute-btn {
+    background: transparent;
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px rgba(0, 240, 255, 0.2);
+    min-width: 100px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.mute-btn:hover {
+    background: var(--neon-blue);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+}
+
+/* Game Frame containing Canvas & Screens */
+.game-frame {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+    background: #111122;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Overlay HUD */
+.hud-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hud-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hud-panel {
+    background: rgba(10, 10, 22, 0.75);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(5px);
+    padding: 8px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.value {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--neon-blue);
+}
+
+.hp-bar-container {
+    width: 120px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-green));
+    transition: width 0.3s ease;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 8px var(--neon-blue);
+    transition: width 0.1s linear;
+}
+
+/* Warnings (e.g. Boss approaching) */
+.warning-banner {
+    position: absolute;
+    top: 30%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 0, 127, 0.85);
+    color: #fff;
+    text-align: center;
+    padding: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #fff;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+}
+
+.warning-banner.active {
+    transform: scaleY(1);
+    animation: warning-pulse 1s infinite alternate;
+}
+
+@keyframes warning-pulse {
+    from { background: rgba(255, 0, 127, 0.85); }
+    to { background: rgba(255, 100, 0, 0.95); }
+}
+
+/* Overlay Screen Templates */
+.overlay-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 22, 0.9);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.overlay-screen.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.overlay-screen h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.overlay-screen p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 320px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.6);
+}
+
+.btn-primary:active {
+    transform: scale(0.95);
+}
+
+/* Scooter Selector Style on Start Screen */
+.scooter-select {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.scooter-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 15px;
+    width: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.scooter-card img, .scooter-card .icon-placeholder {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 10px;
+    background: #222;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.scooter-card.selected {
+    border-color: var(--neon-blue);
+    background: rgba(0, 240, 255, 0.08);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    transform: translateY(-5px);
+}
+
+/* Controls section for Touch/Mobile users */
+.touch-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 5px 5px;
+    gap: 10px;
+}
+
+.ctrl-btn {
+    flex: 1;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-btn:active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    transform: scale(0.96);
+}
+
+.ctrl-btn.horn {
+    flex: 0.8;
+    color: var(--neon-yellow);
+    border-color: rgba(255, 234, 0, 0.2);
+}
+
+.ctrl-btn.horn:active {
+    border-color: var(--neon-yellow);
+    box-shadow: 0 0 10px rgba(255, 234, 0, 0.4);
+}
+
+.instructions-panel {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--glass-border);
+    padding-top: 10px;
+    width: 100%;
+}
+
+.instructions-panel key {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-family: monospace;
+}

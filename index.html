@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>台灣機車避三寶 - 挑戰 90 秒安然無事</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Top Status Bar -->
+        <header class="header-bar">
+            <h1 class="game-title" id="game_header_title">TAIWAN SCOOTER</h1>
+            <div style="display: flex; gap: 10px;">
+                <button class="mute-btn" id="speed_btn" onclick="toggleSpeed()">1X SPEED</button>
+                <button class="mute-btn" id="mute_btn" onclick="toggleMute()">MUTE 🔊</button>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <div class="game-frame">
+            <!-- Canvas -->
+            <canvas id="game_canvas"></canvas>
+
+            <!-- Warnings -->
+            <div id="warning_banner" class="warning-banner">⚠️ BOSS APPROACHING ⚠️</div>
+
+            <!-- Start Screen Overlay -->
+            <div id="start_screen" class="overlay-screen active">
+                <h2 style="color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);">台灣機車避三寶</h2>
+                <p>騎上神車，避開路上各種突發的「台灣特色三寶」，在 90 秒內安然無事抵達終點！</p>
+                
+                <h3 style="margin-bottom: 10px; font-size: 0.9rem; letter-spacing: 1px; color: var(--text-secondary);">選擇你的愛車</h3>
+                <div class="scooter-select">
+                    <div class="scooter-card selected" onclick="selectScooter('classic', this)">
+                        <div class="icon-placeholder">🛵</div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">買菜神車</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">控性佳 / 一般速</div>
+                    </div>
+                    <div class="scooter-card" onclick="selectScooter('delivery', this)">
+                        <div class="icon-placeholder">📦</div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">外送噴射</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">極速高 / 難煞車</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="startGame()">發動引擎 Go!</button>
+                
+                <div class="instructions-panel">
+                    使用鍵盤 <key>←</key> <key>→</key> 或 <key>A</key> <key>D</key> 切換車道。<br>
+                    按 <key>Space</key> / 空白鍵 叭叭（喇叭）。<br>
+                    或使用下方的觸控面板進行遊戲。
+                </div>
+            </div>
+
+            <!-- GameOver Screen Overlay -->
+            <div id="gameover_screen" class="overlay-screen">
+                <h2 style="color: var(--neon-pink); text-shadow: 0 0 15px rgba(255, 0, 127, 0.6);" id="gameover_title">車禍現場！</h2>
+                <p id="gameover_reason">你撞上了突發狀況，請注意路況！</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn-primary" onclick="restartGame()">重新挑戰</button>
+                    <button class="btn-primary" style="background: linear-gradient(45deg, #444, #222); box-shadow: none;" onclick="returnToMenu()">回主畫面</button>
+                </div>
+            </div>
+
+            <!-- Victory Screen Overlay -->
+            <div id="victory_screen" class="overlay-screen">
+                <h2 style="color: var(--neon-green); text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);">安然無事！</h2>
+                <p>恭喜！你成功在台灣馬路上生存了 90 秒，真不愧是台灣道路生存大師！</p>
+                <div id="score_display" style="font-family: 'Orbitron'; font-size: 1.5rem; margin-bottom: 30px; color: var(--neon-yellow);">SCORE: 0</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn-primary" onclick="restartGame()">再騎一場</button>
+                    <button class="btn-primary" style="background: linear-gradient(45deg, #444, #222); box-shadow: none;" onclick="returnToMenu()">回主畫面</button>
+                </div>
+            </div>
+
+            <!-- HUD Elements -->
+            <div class="hud-overlay" id="hud_overlay" style="display: none;">
+                <div class="hud-row">
+                    <div class="hud-panel">
+                        <span class="label">HP</span>
+                        <div class="hp-bar-container">
+                            <div class="hp-fill" id="hp_fill"></div>
+                        </div>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="label">TIME</span>
+                        <span class="value" id="time_val">90.0s</span>
+                    </div>
+                </div>
+                <!-- Progress bar indicating route completed -->
+                <div class="progress-bar-container">
+                    <div class="progress-fill" id="progress_fill"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Touch Controls for mobile/mouse play -->
+        <div class="touch-controls">
+            <button class="ctrl-btn" id="ctrl_left" onmousedown="triggerLeft(true)" onmouseup="triggerLeft(false)" ontouchstart="triggerLeft(true); event.preventDefault();" ontouchend="triggerLeft(false); event.preventDefault();">
+                <span>← 左閃</span>
+            </button>
+            <button class="ctrl-btn horn" id="ctrl_horn" onclick="triggerHorn()">
+                <span>📯 叭叭</span>
+            </button>
+            <button class="ctrl-btn" id="ctrl_right" onmousedown="triggerRight(true)" onmouseup="triggerRight(false)" ontouchstart="triggerRight(true); event.preventDefault();" ontouchend="triggerRight(false); event.preventDefault();">
+                <span>右閃 →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+    <script>
+        // Connect HTML buttons to Javascript logic
+        let leftPressed = false;
+        let rightPressed = false;
+        window.timeScale = 1.0;
+
+        window.onload = () => {
+            checkUnlocks();
+        };
+
+        function checkUnlocks() {
+            if (localStorage.getItem('gameBeaten') === 'true' && !document.getElementById('ultra_btn')) {
+                const ultraBtn = document.createElement('button');
+                ultraBtn.id = 'ultra_btn';
+                ultraBtn.className = 'btn-primary';
+                ultraBtn.style.marginTop = '15px';
+                ultraBtn.style.background = 'linear-gradient(45deg, #ff0000, #ff8c00)';
+                ultraBtn.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.6)';
+                ultraBtn.innerText = '🔥 進入超魔王戰模式 🔥';
+                ultraBtn.onclick = () => startGame(true);
+                document.querySelector('.instructions-panel').before(ultraBtn);
+            }
+        }
+
+        function toggleSpeed() {
+            const hasBeaten = localStorage.getItem('gameBeaten') === 'true';
+            if (window.timeScale === 1.0) {
+                window.timeScale = 2.0;
+                document.getElementById('speed_btn').innerText = "2X SPEED";
+            } else if (window.timeScale === 2.0) {
+                window.timeScale = 3.0;
+                document.getElementById('speed_btn').innerText = "3X SPEED";
+            } else if (window.timeScale === 3.0 && hasBeaten) {
+                window.timeScale = 10.0;
+                document.getElementById('speed_btn').innerText = "10X SPEED";
+                document.getElementById('speed_btn').style.color = "#ff00ff";
+            } else {
+                window.timeScale = 1.0;
+                document.getElementById('speed_btn').innerText = "1X SPEED";
+                document.getElementById('speed_btn').style.color = "var(--neon-blue)";
+            }
+        }
+
+        function triggerLeft(val) {
+            leftPressed = val;
+            if (window.gameInstance) {
+                window.gameInstance.keys.left = val;
+            }
+        }
+
+        function triggerRight(val) {
+            rightPressed = val;
+            if (window.gameInstance) {
+                window.gameInstance.keys.right = val;
+            }
+        }
+
+        function triggerHorn() {
+            if (window.audioManager) {
+                window.audioManager.playHorn();
+            }
+            if (window.gameInstance) {
+                window.gameInstance.hornTriggered();
+            }
+        }
+
+        function selectScooter(type, element) {
+            document.querySelectorAll('.scooter-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            if (window.gameInstance) {
+                window.gameInstance.setScooterType(type);
+            }
+        }
+
+        function toggleMute() {
+            if (window.audioManager) {
+                const isMuted = window.audioManager.toggleMute();
+                document.getElementById('mute_btn').innerText = isMuted ? "UNMUTE 🔇" : "MUTE 🔊";
+            }
+        }
+
+        function startGame(ultra = false) {
+            document.getElementById('start_screen').classList.remove('active');
+            document.getElementById('hud_overlay').style.display = 'flex';
+            if (window.audioManager) {
+                window.audioManager.init();
+            }
+            if (window.gameInstance) {
+                window.gameInstance.isUltraMode = ultra;
+                window.gameInstance.start();
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('gameover_screen').classList.remove('active');
+            document.getElementById('victory_screen').classList.remove('active');
+            document.getElementById('hud_overlay').style.display = 'flex';
+            if (window.gameInstance) {
+                window.gameInstance.start();
+            }
+        }
+
+        function returnToMenu() {
+            document.getElementById('gameover_screen').classList.remove('active');
+            document.getElementById('victory_screen').classList.remove('active');
+            document.getElementById('hud_overlay').style.display = 'none';
+            document.getElementById('start_screen').classList.add('active');
+            checkUnlocks();
+        }
+    </script>
+</body>
+</html>
