@@ -99,6 +99,7 @@ class Game {
         this.boss60Triggered = false;
         this.boss73Triggered = false;
         this.boss80Triggered = false;
+        this.boss85Triggered = false;
 
         if (window.audioManager) {
             window.audioManager.startEngine();
@@ -293,6 +294,7 @@ class Game {
             if (second === 33 && !this.boss33Triggered) { this.boss33Triggered = true; this.triggerUltraBossB(); }
             if (second === 53 && !this.boss53Triggered) { this.boss53Triggered = true; this.triggerUltraBossC(); }
             if (second === 73 && !this.boss73Triggered) { this.boss73Triggered = true; this.triggerUltraBossFinal(); }
+            if (second === 85 && !this.boss85Triggered) { this.boss85Triggered = true; this.triggerFraudFall(); }
         } else {
             if (second === 20 && !this.boss20Triggered) { this.boss20Triggered = true; this.triggerPotholeStorm(); }
             if (second === 40 && !this.boss40Triggered) { this.boss40Triggered = true; this.triggerMotorcycleSqueeze(); }
