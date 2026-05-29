@@ -140,7 +140,6 @@
 
         function toggleSpeed() {
             const hasBeaten = localStorage.getItem('gameBeaten') === 'true';
-            const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
             
             if (window.timeScale === 1.0) {
                 window.timeScale = 2.0;
@@ -148,7 +147,7 @@
             } else if (window.timeScale === 2.0) {
                 window.timeScale = 3.0;
                 document.getElementById('speed_btn').innerText = "3X SPEED";
-            } else if (window.timeScale === 3.0 && hasBeaten && !isMobile) {
+            } else if (window.timeScale === 3.0 && hasBeaten) {
                 window.timeScale = 10.0;
                 document.getElementById('speed_btn').innerText = "10X SPEED";
                 document.getElementById('speed_btn').style.color = "#ff00ff";
