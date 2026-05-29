@@ -90,9 +90,14 @@ class Game {
         this.warningTimer = 0;
         
         // Reset boss triggers
+        this.boss5Triggered = false;
+        this.boss13Triggered = false;
         this.boss20Triggered = false;
+        this.boss33Triggered = false;
         this.boss40Triggered = false;
+        this.boss53Triggered = false;
         this.boss60Triggered = false;
+        this.boss73Triggered = false;
         this.boss80Triggered = false;
 
         if (window.audioManager) {
@@ -247,10 +252,11 @@ class Game {
         // Show warnings ahead of BOSS events
         let isBossImpending = false;
         if (this.isUltraMode) {
-            isBossImpending = (this.gameTime > 7 && this.gameTime < 10) ||
-                              (this.gameTime > 27 && this.gameTime < 30) ||
-                              (this.gameTime > 47 && this.gameTime < 50) ||
-                              (this.gameTime > 67 && this.gameTime < 70);
+            isBossImpending = (this.gameTime > 2 && this.gameTime < 5) ||
+                              (this.gameTime > 10 && this.gameTime < 13) ||
+                              (this.gameTime > 30 && this.gameTime < 33) ||
+                              (this.gameTime > 50 && this.gameTime < 53) ||
+                              (this.gameTime > 70 && this.gameTime < 73);
         } else {
             isBossImpending = (this.gameTime > 17 && this.gameTime < 20) ||
                               (this.gameTime > 37 && this.gameTime < 40) ||
@@ -262,10 +268,11 @@ class Game {
         if (isBossImpending) {
             let label = "⚠️ 注意 ⚠️";
             if (this.isUltraMode) {
-                if (this.gameTime < 10) label = "⚠️ 坑洞 ＆ 夾擊 ⚠️";
-                else if (this.gameTime < 30) label = "⚠️ 毒駕 ＆ 碰瓷 ⚠️";
-                else if (this.gameTime < 50) label = "⚠️ 四車包夾 ＆ 坑洞 ⚠️";
-                else if (this.gameTime < 70) label = "🔥 終極魔王大亂鬥 🔥";
+                if (this.gameTime < 5) label = "⚠️ 飆車少年團 ⚠️";
+                else if (this.gameTime < 13) label = "⚠️ 坑洞 ＆ 夾擊 ⚠️";
+                else if (this.gameTime < 33) label = "⚠️ 毒駕 ＆ 碰瓷 ⚠️";
+                else if (this.gameTime < 53) label = "⚠️ 四車包夾 ＆ 坑洞 ⚠️";
+                else if (this.gameTime < 73) label = "🔥 終極魔王大亂鬥 🔥";
             } else {
                 if (this.gameTime < 20) label = "⚠️ 前方連續路坑 ⚠️";
                 else if (this.gameTime < 40) label = "⚠️ 注意後方逼車 ⚠️";
@@ -281,10 +288,11 @@ class Game {
         // Trigger boss spawns
         const second = Math.floor(this.gameTime);
         if (this.isUltraMode) {
-            if (second === 10 && !this.boss20Triggered) { this.boss20Triggered = true; this.triggerUltraBossA(); }
-            if (second === 30 && !this.boss40Triggered) { this.boss40Triggered = true; this.triggerUltraBossB(); }
-            if (second === 50 && !this.boss60Triggered) { this.boss60Triggered = true; this.triggerUltraBossC(); }
-            if (second === 70 && !this.boss80Triggered) { this.boss80Triggered = true; this.triggerUltraBossFinal(); }
+            if (second === 5 && !this.boss5Triggered) { this.boss5Triggered = true; this.triggerUltraBossGang(); }
+            if (second === 13 && !this.boss13Triggered) { this.boss13Triggered = true; this.triggerUltraBossA(); }
+            if (second === 33 && !this.boss33Triggered) { this.boss33Triggered = true; this.triggerUltraBossB(); }
+            if (second === 53 && !this.boss53Triggered) { this.boss53Triggered = true; this.triggerUltraBossC(); }
+            if (second === 73 && !this.boss73Triggered) { this.boss73Triggered = true; this.triggerUltraBossFinal(); }
         } else {
             if (second === 20 && !this.boss20Triggered) { this.boss20Triggered = true; this.triggerPotholeStorm(); }
             if (second === 40 && !this.boss40Triggered) { this.boss40Triggered = true; this.triggerMotorcycleSqueeze(); }
@@ -346,6 +354,21 @@ class Game {
     }
 
     // --- BOSS EVENTS IMPLEMENTATION ---
+
+    triggerUltraBossGang() {
+        if (window.audioManager) window.audioManager.playScreech();
+        // 7 motorcycles linked together, taking up center road
+        for (let i = 0; i < 7; i++) {
+            this.spawnObstacle('scooter', {
+                x: 90 + (i * 40), // Spread from x=90 to 330
+                y: 850 + (i % 2 === 0 ? 0 : 35), // slight zigzag formation
+                speedY: 13, // very fast overtake
+                stopping: false,
+                squeezeState: 'passing',
+                color: `hsl(${i * 45}, 100%, 50%)` // Rainbow gang colors
+            });
+        }
+    }
 
     triggerUltraBossA() {
         this.triggerPotholeStorm();
